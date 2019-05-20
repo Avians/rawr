@@ -1,8 +1,20 @@
 import { Button, Container } from "semantic-ui-react";
 
 import React from "react";
+import snoowrap from "snoowrap";
 
 function Site() {
+    snoowrap
+        .fromAuthCode({
+            code: "_l5HEWYv64eJQw8hLMhkddDFFAc",
+            userAgent: "RAWR",
+            clientId: "somethingsomething",
+            redirectUri: "example.com",
+        })
+        .then(r => {
+            console.log(r);
+        });
+
     return (
         <Container textAlign="center">
             <h1>Site.js</h1>
@@ -13,7 +25,6 @@ function Site() {
                 labelPosition="left"
                 onClick={e => {
                     e.preventDefault();
-                    alert("Why do you hurt me like this?");
                 }}
             />
         </Container>

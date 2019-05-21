@@ -1,4 +1,4 @@
-import { RedditProvider } from "./reddit";
+import { RedditFilter, RedditProvider } from "./reddit";
 
 it("exists", async () => {
     const client = await RedditProvider.clientFromEnv();
@@ -7,6 +7,6 @@ it("exists", async () => {
         limit: 1,
     });
     const comments = await client.getThreadComments(threads[0].id);
-    console.log(comments.length);
+    console.log(JSON.stringify(await RedditFilter.filterForImages(comments)));
     expect(1).toEqual(1);
-});
+}, 50000);

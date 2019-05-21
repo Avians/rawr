@@ -7,7 +7,13 @@ const UrlBar = props => {
         <Input
             fluid
             loading={loading}
-            action={!loading && { content: "Load", onClick: onActionClick }}
+            action={
+                !loading && {
+                    content: "Load",
+                    onClick: onActionClick,
+                    primary: true,
+                }
+            }
             placeholder="Reddit thread URL..."
             {...restProps}
         />

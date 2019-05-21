@@ -73,7 +73,8 @@ export class RedditFilter {
 
     static __matchForImage(body) {
         const regex = /https?:\/\/[^\s]+/gi;
-        return body.match(regex);
+        const matches = body.match(regex);
+        return matches != null ? matches : [];
     }
 
     static __cleanUrl(url) {

@@ -99,31 +99,41 @@ export class RedditFilter {
         let fulfilled = [];
 
         const expandedComment = await comment.expandReplies();
-        for (const reply of expandedComment.replies) {
+        const addImage = (comment, image) => {
             fulfilled.push({
-                fulfilled_by: reply.author.name,
-                images: this.__matchForImage(reply.body)
-                    .map(url => this.__cleanUrl(url))
-                    .filter(url => this.__isValidImage(url)),
+                fulfilled_by: comment.author.name,
+                image: image,
+                score: comment.score,
             });
+        };
+
+        for (const reply of expandedComment.replies) {
+            this.__matchForImage(reply.body)
+                .map(url => this.__cleanUrl(url))
+                .filter(url => this.__isValidImage(url))
+                .forEach(image => addImage(reply, image));
+
+            fulfilled = [...fulfilled, ...(await this.__filterDepth(reply))];
         }
 
         return fulfilled;
     }
 
     static async filterForImages(comments) {
-        let commisions = [];
+        let results = [];
         for (const comment of comments) {
-            const fulfilled = await this.__filterDepth(comment);
-            if (!fulfilled || fulfilled.length === 0) {
+            const commissions = await this.__filterDepth(comment);
+            if (!commissions || commissions.length === 0) {
                 continue;
             }
 
-            commisions.push({
-                requested_by: comment.author.name,
-                commisions: fulfilled,
+            commissions.forEach(commision => {
+                results.push({
+                    requested_by: comment.author.name,
+                    ...commision,
+                });
             });
         }
-        return commisions;
+        return results;
     }
 }

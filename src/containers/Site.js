@@ -1,8 +1,7 @@
-import { Container, Header } from "semantic-ui-react";
+import { Container, Grid, Header } from "semantic-ui-react";
 import React, { Component } from "react";
 import { RedditFilter, RedditProvider } from "../providers/reddit/reddit";
-
-import { UrlBar } from "components";
+import { SubmissionPreview, UrlBar } from "components";
 
 const urlValidationRegex = /[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/gi;
 
@@ -13,7 +12,15 @@ class Site extends Component {
 
         redditClient: null,
         watchedThreadId: "",
-        results: [],
+        results: [
+            {
+                imageUrl: "https://i.imgur.com/YnOHxh6.jpg",
+                resolution: "200x200",
+                requestedBy: "notzain",
+                fulfilledBy: "yoshi",
+                score: "100",
+            },
+        ],
     };
 
     async componentDidMount() {
@@ -27,6 +34,8 @@ class Site extends Component {
                 nextState.watchedThreadId
             );
             const commisions = await RedditFilter.filterForImages(comments);
+
+            // dubious place to update state?
             this.setState({
                 loading: false,
                 results: commisions,
@@ -76,6 +85,22 @@ class Site extends Component {
                     onActionClick={this.handleUrlLoad}
                     onKeyPress={this.handleKeyPress}
                 />
+
+                <br />
+
+                <Grid columns={4} stackable>
+                    {this.state.results.map(request => (
+                        <Grid.Column width={4}>
+                            <SubmissionPreview
+                                imageUrl={request.image}
+                                resolution="200x200"
+                                requestedBy={request.requested_by}
+                                fulfilledBy={request.fulfilled_by}
+                                score={request.score}
+                            />
+                        </Grid.Column>
+                    ))}
+                </Grid>
             </Container>
         );
     }

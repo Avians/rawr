@@ -6,7 +6,7 @@ it("exists", async () => {
         subreddit: "Animewallpaper",
         limit: 1,
     });
-    const comments = await client.getThreadComments(threads[0].id);
+    const comments = await client.getThreadComments("bs3d1b");
     console.log(JSON.stringify(await RedditFilter.filterForImages(comments)));
     expect(1).toEqual(1);
 }, 50000);

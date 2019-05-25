@@ -33,7 +33,9 @@ class Site extends Component {
             const comments = await this.state.redditClient.getThreadComments(
                 nextState.watchedThreadId
             );
-            const commisions = await RedditFilter.filterForImages(comments);
+            const commisions = await new RedditFilter().filterForImages(
+                comments
+            );
 
             // dubious place to update state?
             this.setState({

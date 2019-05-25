@@ -1,7 +1,9 @@
-import { Container, Grid, Header } from "semantic-ui-react";
+import { Button, Container, Grid, Header } from "semantic-ui-react";
 import React, { Component } from "react";
 import { RedditFilter, RedditProvider } from "../providers/reddit/reddit";
 import { SubmissionPreview, UrlBar } from "components";
+
+import { ImgurProvider } from "../providers/imgur/imgur";
 
 const urlValidationRegex = /[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/gi;
 
@@ -11,6 +13,8 @@ class Site extends Component {
         loading: false,
 
         redditClient: null,
+        imgurClient: null,
+
         watchedThreadId: "",
         results: [
             {
@@ -25,7 +29,8 @@ class Site extends Component {
 
     async componentDidMount() {
         const redditClient = await RedditProvider.clientFromEnv();
-        this.setState({ redditClient: redditClient });
+        const imgurClient = await ImgurProvider.createFromEnv();
+        this.setState({ redditClient: redditClient, imgurClient: imgurClient });
     }
 
     async componentWillUpdate(nextProps, nextState) {
@@ -76,6 +81,26 @@ class Site extends Component {
         if (key === "Enter") this.handleUrlLoad();
     };
 
+    onUploadClick = async () => {
+        await this.state.imgurClient.createNewAlbum("RAWR");
+        for (const result of this.state.results) {
+            const description = [
+                `Requested by: ${result.requested_by}`,
+                `Fulfilled by: ${result.fulfilled_by}`,
+            ];
+            try {
+                await this.state.imgurClient.uploadImageToAlbum({
+                    imageUrl: result.image,
+                    description: description.join("\n"),
+                });
+            } catch (err) {
+                console.log(err.message);
+            }
+        }
+
+        alert(this.state.imgurClient.albumUrl());
+    };
+
     render() {
         return (
             <Container textAlign="center" style={{ paddingTop: "1.25em" }}>
@@ -103,6 +128,8 @@ class Site extends Component {
                         </Grid.Column>
                     ))}
                 </Grid>
+
+                <Button onClick={this.onUploadClick}>Upload now</Button>
             </Container>
         );
     }

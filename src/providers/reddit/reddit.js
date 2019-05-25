@@ -1,3 +1,4 @@
+import _ from "lodash";
 import snoowrap from "snoowrap";
 
 export class RedditProvider {
@@ -62,6 +63,17 @@ export class RedditProvider {
 }
 
 export class RedditFilter {
+    /**
+     * @param {Object<min_depth: num, valid_extensions: array} options
+     */
+    constructor(options) {
+        const defaults = {
+            min_depth: 1,
+            valid_extensions: ["jpeg", "jpg", "png"],
+        };
+
+        this.options = _.defaults(options, defaults);
+    }
     static urlToSubredditAndId(url) {
         const regex = /reddit.com\/r\/([a-z0-9]*)\/comments\/([a-z0-9]*)\//gi;
         const result = regex.exec(url);
@@ -89,16 +101,13 @@ export class RedditFilter {
         return url;
     }
 
-    static __isValidImage(url) {
-        return (
-            url.endsWith("jpg") || url.endsWith("jpeg") || url.endsWith("png")
-        );
+    __isValidImage(url) {
+        return _.some(this.options.valid_extensions, ext => url.endsWith(ext));
     }
 
-    static async __filterDepth(comment) {
+    async __filterDepth(comment, curDepth) {
         let fulfilled = [];
 
-        const expandedComment = await comment.expandReplies();
         const addImage = (comment, image) => {
             fulfilled.push({
                 fulfilled_by: comment.author.name,
@@ -106,23 +115,38 @@ export class RedditFilter {
                 score: comment.score,
             });
         };
-
-        for (const reply of expandedComment.replies) {
-            this.__matchForImage(reply.body)
-                .map(url => this.__cleanUrl(url))
+        const checkBodyAndAddImage = comment => {
+            RedditFilter.__matchForImage(comment.body)
+                .map(url => RedditFilter.__cleanUrl(url))
                 .filter(url => this.__isValidImage(url))
-                .forEach(image => addImage(reply, image));
+                .forEach(image => addImage(comment, image));
+        };
 
-            fulfilled = [...fulfilled, ...(await this.__filterDepth(reply))];
+        if (curDepth >= this.options.min_depth) {
+            checkBodyAndAddImage(comment);
         }
+
+        for (const reply of comment.replies) {
+            fulfilled = [
+                ...fulfilled,
+                ...(await this.__filterDepth(reply, curDepth + 1)),
+            ];
+        }
+
+        // this.__matchForImage(reply.body)
+        //     .map(url => this.__cleanUrl(url))
+        //     .filter(url => this.__isValidImage(url))
+        //     .forEach(image => addImage(reply, image));
+
+        // fulfilled = [...fulfilled, ...(await this.__filterDepth(reply))];
 
         return fulfilled;
     }
 
-    static async filterForImages(comments) {
+    async filterForImages(comments) {
         let results = [];
         for (const comment of comments) {
-            const commissions = await this.__filterDepth(comment);
+            const commissions = await this.__filterDepth(comment, 0);
             if (!commissions || commissions.length === 0) {
                 continue;
             }

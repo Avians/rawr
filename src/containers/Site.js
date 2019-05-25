@@ -1,7 +1,8 @@
-import { Button, Container, Grid, Header } from "semantic-ui-react";
+import { Button, Container, Divider, Header } from "semantic-ui-react";
 import React, { Component } from "react";
-import { RedditFilter, RedditProvider } from "../providers/reddit/reddit";
-import { SubmissionPreview, UrlBar } from "components";
+import { RedditFilter, RedditProvider } from "providers/reddit/reddit";
+import { UrlBar } from "components";
+import { SelectionGrid } from "containers";
 
 import { ImgurProvider } from "../providers/imgur/imgur";
 
@@ -16,15 +17,7 @@ class Site extends Component {
         imgurClient: null,
 
         watchedThreadId: "",
-        results: [
-            {
-                imageUrl: "https://i.imgur.com/YnOHxh6.jpg",
-                resolution: "200x200",
-                requestedBy: "notzain",
-                fulfilledBy: "yoshi",
-                score: "100",
-            },
-        ],
+        results: [],
     };
 
     async componentDidMount() {
@@ -43,12 +36,26 @@ class Site extends Component {
             );
 
             // dubious place to update state?
+            // idk it works, so lesgo
             this.setState({
                 loading: false,
-                results: commisions,
+                results: commisions.map((value, index) => ({
+                    ...value,
+                    selected: value.score >= 1,
+                    toggleSelected: () => this.toggleSelected(index),
+                })),
             });
         }
     }
+
+    toggleSelected = index => {
+        const results = this.state.results;
+        results[index] = {
+            ...results[index],
+            selected: !results[index].selected,
+        };
+        this.setState({ results: results });
+    };
 
     updateUrlValue = evt => {
         this.setState({ url: evt.target.value });
@@ -83,7 +90,9 @@ class Site extends Component {
 
     onUploadClick = async () => {
         await this.state.imgurClient.createNewAlbum("RAWR");
-        for (const result of this.state.results) {
+        for (const result of this.state.results.filter(
+            value => value.selected
+        )) {
             const description = [
                 `Requested by: ${result.requested_by}`,
                 `Fulfilled by: ${result.fulfilled_by}`,
@@ -102,6 +111,7 @@ class Site extends Component {
     };
 
     render() {
+        console.log(this.state.results);
         return (
             <Container textAlign="center" style={{ paddingTop: "1.25em" }}>
                 <Header as="h1">RAWR</Header>
@@ -112,22 +122,12 @@ class Site extends Component {
                     onActionClick={this.handleUrlLoad}
                     onKeyPress={this.handleKeyPress}
                 />
-
-                <br />
-
-                <Grid columns={4} stackable>
-                    {this.state.results.map(request => (
-                        <Grid.Column width={4}>
-                            <SubmissionPreview
-                                imageUrl={request.image}
-                                resolution="200x200"
-                                requestedBy={request.requested_by}
-                                fulfilledBy={request.fulfilled_by}
-                                score={request.score}
-                            />
-                        </Grid.Column>
-                    ))}
-                </Grid>
+                {this.state.results.length > 0 && (
+                    <>
+                        <Divider horizontal>Fulfilled Requests</Divider>
+                        <SelectionGrid data={this.state.results} />
+                    </>
+                )}
 
                 <Button onClick={this.onUploadClick}>Upload now</Button>
             </Container>

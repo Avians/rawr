@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Card, Label, List, Button, Modal, Image } from "semantic-ui-react";
+import React from "react";
+import { Card, List, Button, Modal, Image } from "semantic-ui-react";
 
 // TODO: Extract to CSS, probably.
 const imgContainerStyle = {
@@ -47,13 +47,18 @@ const ImageContainer = props => {
 };
 
 const SubmissionPreview = props => {
-    const { imageUrl, resolution, requestedBy, fulfilledBy, score } = props;
-    const [included, setIncluded] = useState(true);
-
+    const {
+        imageUrl,
+        requestedBy,
+        fulfilledBy,
+        score,
+        selected,
+        toggleSelected,
+    } = props;
     return (
-        <Card color={included && "green"}>
+        <Card color={selected ? "green" : undefined}>
             <ImageModal imageUrl={imageUrl} />
-            <Label attached="top right">{resolution}</Label>
+            {/* <Label attached="top right">{resolution}</Label> */}
             <Card.Content textAlign="left">
                 <List>
                     <List.Item>
@@ -86,10 +91,10 @@ const SubmissionPreview = props => {
                 <Button
                     fluid
                     basic
-                    positive={included}
-                    onClick={() => setIncluded(!included)}
+                    positive={selected}
+                    onClick={toggleSelected}
                 >
-                    {included ? "Uploading" : "Not uploading"}
+                    {selected ? "Uploading" : "Not uploading"}
                 </Button>
             </Card.Content>
         </Card>

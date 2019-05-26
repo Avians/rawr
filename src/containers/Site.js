@@ -104,7 +104,7 @@ class Site extends Component {
         this.setState({ uploading: true });
         await this.state.imgurClient.createNewAlbum(this.state.albumName);
 
-        this.state.result
+        this.state.results
             .filter(value => value.selected)
             .forEach((result, index) => {
                 const description = [

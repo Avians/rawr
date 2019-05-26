@@ -128,7 +128,6 @@ class Site extends Component {
     };
 
     render() {
-        console.log(this.state.results);
         return (
             <Container textAlign="center" style={{ paddingTop: "1.25em" }}>
                 <Header as="h1">RAWR</Header>

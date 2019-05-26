@@ -1,10 +1,11 @@
-import { Button, Container, Divider, Header } from "semantic-ui-react";
+import { Container, Divider, Header, Input, Progress } from "semantic-ui-react";
 import React, { Component } from "react";
 import { RedditFilter, RedditProvider } from "providers/reddit/reddit";
 import { UrlBar } from "components";
 import { SelectionGrid } from "containers";
 
 import { ImgurProvider } from "../providers/imgur/imgur";
+import UploadButton from "components/UploadButton";
 
 const urlValidationRegex = /[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/gi;
 
@@ -12,6 +13,9 @@ class Site extends Component {
     state = {
         url: "",
         loading: false,
+        albumName: "RAWR",
+        uploading: false,
+        amountUploaded: 0,
 
         redditClient: null,
         imgurClient: null,
@@ -61,6 +65,10 @@ class Site extends Component {
         this.setState({ url: evt.target.value });
     };
 
+    updateAlbumName = evt => {
+        this.setState({ albumName: evt.target.value });
+    };
+
     handleUrlLoad = () => {
         const url = this.state.url;
 
@@ -88,25 +96,34 @@ class Site extends Component {
         if (key === "Enter") this.handleUrlLoad();
     };
 
-    onUploadClick = async () => {
-        await this.state.imgurClient.createNewAlbum("RAWR");
-        for (const result of this.state.results.filter(
-            value => value.selected
-        )) {
-            const description = [
-                `Requested by: ${result.requested_by}`,
-                `Fulfilled by: ${result.fulfilled_by}`,
-            ];
-            try {
-                await this.state.imgurClient.uploadImageToAlbum({
-                    imageUrl: result.image,
-                    description: description.join("\n"),
-                });
-            } catch (err) {
-                console.log(err.message);
-            }
-        }
+    handleAlbumNameKeyPress = ({ key }) => {
+        if (key === "Enter") this.onUploadClick();
+    };
 
+    onUploadClick = async () => {
+        this.setState({ uploading: true });
+        await this.state.imgurClient.createNewAlbum(this.state.albumName);
+
+        this.state.result
+            .filter(value => value.selected)
+            .forEach((result, index) => {
+                const description = [
+                    `Requested by: ${result.requested_by}`,
+                    `Fulfilled by: ${result.fulfilled_by}`,
+                ];
+                try {
+                    this.state.imgurClient.uploadImageToAlbum({
+                        imageUrl: result.image,
+                        description: description.join("\n"),
+                    });
+                } catch (err) {
+                    console.error(err);
+                } finally {
+                    this.setState({ amountUploaded: index + 1 });
+                }
+            });
+
+        this.setState({ uploading: false, amountUploaded: 0 });
         alert(this.state.imgurClient.albumUrl());
     };
 
@@ -126,10 +143,29 @@ class Site extends Component {
                     <>
                         <Divider horizontal>Fulfilled Requests</Divider>
                         <SelectionGrid data={this.state.results} />
+                        <Divider horizontal>Upload</Divider>
+                        <Input
+                            fluid
+                            label="Album Name"
+                            value={this.state.albumName}
+                            onChange={this.updateAlbumName}
+                            onKeyPress={this.handleAlbumNameKeyPress}
+                        />
+                        {this.state.uploading && (
+                            <Progress
+                                value={this.state.amountUploaded}
+                                total={this.state.results.length}
+                                progress="ratio"
+                            />
+                        )}
+                        <UploadButton
+                            onClick={this.onUploadClick}
+                            disabled={this.state.uploading}
+                        >
+                            Upload to Imgur
+                        </UploadButton>
                     </>
                 )}
-
-                <Button onClick={this.onUploadClick}>Upload now</Button>
             </Container>
         );
     }

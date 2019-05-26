@@ -94,7 +94,7 @@ const SubmissionPreview = props => {
                     positive={selected}
                     onClick={toggleSelected}
                 >
-                    {selected ? "Uploading" : "Not uploading"}
+                    {selected ? "Added to album" : "Removed from album"}
                 </Button>
             </Card.Content>
         </Card>

@@ -1,11 +1,11 @@
 import { Container, Divider, Header, Input, Progress } from "semantic-ui-react";
 import React, { Component } from "react";
 import { RedditFilter, RedditProvider } from "providers/reddit/reddit";
-import { UrlBar } from "components";
-import { SelectionGrid } from "containers";
 
 import { ImgurProvider } from "../providers/imgur/imgur";
+import { SelectionGrid } from "containers";
 import UploadButton from "components/UploadButton";
+import { UrlBar } from "components";
 
 const urlValidationRegex = /[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/gi;
 
@@ -39,8 +39,8 @@ class Site extends Component {
                 comments
             );
 
-            // dubious place to update state?
-            // idk it works, so lesgo
+            // z: dubious place to update state?
+            // r: idk it works, so lesgo
             this.setState({
                 loading: false,
                 results: commisions.map((value, index) => ({
@@ -104,27 +104,32 @@ class Site extends Component {
         this.setState({ uploading: true });
         await this.state.imgurClient.createNewAlbum(this.state.albumName);
 
-        this.state.results
-            .filter(value => value.selected)
-            .forEach((result, index) => {
-                const description = [
-                    `Requested by: ${result.requested_by}`,
-                    `Fulfilled by: ${result.fulfilled_by}`,
-                ];
-                try {
-                    this.state.imgurClient.uploadImageToAlbum({
-                        imageUrl: result.image,
-                        description: description.join("\n"),
-                    });
-                } catch (err) {
-                    console.error(err);
-                } finally {
-                    this.setState({ amountUploaded: index + 1 });
-                }
-            });
+        const filtered = this.state.results.filter(value => value.selected);
+        filtered.forEach(async result => {
+            const description = [
+                `Requested by: ${result.requested_by}`,
+                `Fulfilled by: ${result.fulfilled_by}`,
+            ];
+            try {
+                await this.state.imgurClient.uploadImageToAlbum({
+                    imageUrl: result.image,
+                    description: description.join("\n"),
+                });
+            } catch (err) {
+                console.error(err);
+            } finally {
+                this.setState((prevState, _) => ({
+                    amountUploaded: prevState.amountUploaded + 1,
+                }));
 
-        this.setState({ uploading: false, amountUploaded: 0 });
-        alert(this.state.imgurClient.albumUrl());
+                if (this.state.amountUploaded === filtered.length) {
+                    // TODO: dont alert, think about muh ux
+                    alert(this.state.imgurClient.albumUrl());
+
+                    this.setState({ uploading: false, amountUploaded: 0 });
+                }
+            }
+        });
     };
 
     render() {

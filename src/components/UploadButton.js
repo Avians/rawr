@@ -1,5 +1,6 @@
-import React from "react";
 import { Button, Icon } from "semantic-ui-react";
+
+import React from "react";
 
 const UploadButton = ({ children, ...restProps }) => (
     <Button
@@ -7,7 +8,7 @@ const UploadButton = ({ children, ...restProps }) => (
         color="green"
         fluid
         {...restProps}
-        style={{ marginBottom: "50vh" }}
+        // style={{ marginBottom: "50vh" }}
     >
         <Icon name="upload" />
         {children}

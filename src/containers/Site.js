@@ -1,4 +1,13 @@
-import { Container, Divider, Header, Input, Progress } from "semantic-ui-react";
+import {
+    Container,
+    Divider,
+    Header,
+    Input,
+    List,
+    Message,
+    Progress,
+    Transition,
+} from "semantic-ui-react";
 import React, { Component } from "react";
 import { RedditFilter, RedditProvider } from "providers/reddit/reddit";
 
@@ -17,6 +26,8 @@ class Site extends Component {
         uploading: false,
         amountUploaded: 0,
 
+        messages: [],
+
         redditClient: null,
         imgurClient: null,
 
@@ -30,7 +41,7 @@ class Site extends Component {
         this.setState({ redditClient: redditClient, imgurClient: imgurClient });
     }
 
-    async componentWillUpdate(nextProps, nextState) {
+    async componentWillUpdate(_, nextState) {
         if (this.state.watchedThreadId !== nextState.watchedThreadId) {
             const comments = await this.state.redditClient.getThreadComments(
                 nextState.watchedThreadId
@@ -116,19 +127,45 @@ class Site extends Component {
                     description: description.join("\n"),
                 });
             } catch (err) {
-                console.error(err);
+                this.addMessage(
+                    "Picture failed to upload.",
+                    `${result.image} failed to upload.`,
+                    { error: true }
+                );
             } finally {
                 this.setState((prevState, _) => ({
                     amountUploaded: prevState.amountUploaded + 1,
                 }));
 
                 if (this.state.amountUploaded === filtered.length) {
-                    // TODO: dont alert, think about muh ux
-                    alert(this.state.imgurClient.albumUrl());
+                    this.addMessage(
+                        "Album has been uploaded to Imgur!",
+                        `Check it out at ${this.state.imgurClient.albumUrl()}.`,
+                        { success: true }
+                    );
 
                     this.setState({ uploading: false, amountUploaded: 0 });
                 }
             }
+        });
+    };
+
+    onMessageDismiss = index => {
+        this.setState({
+            messages: this.state.messages.filter((_, i) => i !== index),
+        });
+    };
+
+    addMessage = (header, content, type) => {
+        this.setState({
+            messages: [
+                ...this.state.messages,
+                {
+                    type: type,
+                    header: header,
+                    content: content,
+                },
+            ],
         });
     };
 
@@ -170,6 +207,21 @@ class Site extends Component {
                         </UploadButton>
                     </>
                 )}
+
+                <Transition.Group as={List} duration={200}>
+                    {this.state.messages.map((message, index) => (
+                        <List.Item key={index}>
+                            <Message
+                                {...message.type}
+                                onDismiss={() => this.onMessageDismiss(index)}
+                                header={message.header}
+                                content={message.content}
+                            />
+                        </List.Item>
+                    ))}
+                </Transition.Group>
+
+                <div style={{ paddingBottom: "50vh" }} />
             </Container>
         );
     }

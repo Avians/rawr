@@ -3,6 +3,7 @@
     "version": "0.1.0",
     "private": true,
     "dependencies": {
+        "@use-hooks/image-size": "^1.0.5",
         "axios": "^0.18.0",
         "image-size": "^0.7.4",
         "imgur": "^0.3.1",

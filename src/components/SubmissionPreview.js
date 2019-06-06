@@ -1,5 +1,7 @@
+import { Button, Card, Image, Label, List, Modal } from "semantic-ui-react";
+
 import React from "react";
-import { Card, List, Button, Modal, Image } from "semantic-ui-react";
+import useImageSize from "@use-hooks/image-size";
 
 // TODO: Extract to CSS, probably.
 const imgContainerStyle = {
@@ -55,10 +57,14 @@ const SubmissionPreview = props => {
         selected,
         toggleSelected,
     } = props;
+    const [width, height] = useImageSize(imageUrl);
+    const isValidSize = (width, height) => width !== 0 && height !== 0;
     return (
         <Card color={selected ? "green" : undefined}>
             <ImageModal imageUrl={imageUrl} />
-            {/* <Label attached="top right">{resolution}</Label> */}
+            {isValidSize(width, height) && (
+                <Label attached="top right">{`${width}x${height}`}</Label>
+            )}
             <Card.Content textAlign="left">
                 <List>
                     <List.Item>

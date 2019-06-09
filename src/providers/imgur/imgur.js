@@ -12,6 +12,16 @@ export class ImgurProvider {
         });
     }
 
+    async fetchAlbumImagesFromHash(hash) {
+        const url = `https://api.imgur.com/3/album/${hash}/images`;
+        const headers = {
+            Authorization: `Client-ID ${this.clientId}`,
+        };
+        const response = await axios.get(url, { headers: headers });
+        const images = response["data"]["data"];
+        return images.map(image => image["link"]);
+    }
+
     async createNewAlbum(title) {
         const url = "https://api.imgur.com/3/album";
         const payload = {

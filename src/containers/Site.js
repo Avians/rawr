@@ -9,9 +9,10 @@ import {
     Transition,
 } from "semantic-ui-react";
 import React, { Component } from "react";
-import { RedditFilter, RedditProvider } from "providers/reddit/reddit";
 
+import { CommentFilter } from "../filters/CommentFilter";
 import { ImgurProvider } from "../providers/imgur/imgur";
+import { RedditProvider } from "providers/reddit/reddit";
 import { SelectionGrid } from "containers";
 import UploadButton from "components/UploadButton";
 import { UrlBar } from "components";
@@ -46,7 +47,7 @@ class Site extends Component {
             const comments = await this.state.redditClient.getThreadComments(
                 nextState.watchedThreadId
             );
-            const commisions = await new RedditFilter().filterForImages(
+            const commissions = await new CommentFilter().filterForImages(
                 comments
             );
 
@@ -54,7 +55,7 @@ class Site extends Component {
             // r: idk it works, so lesgo
             this.setState({
                 loading: false,
-                results: commisions.map((value, index) => ({
+                results: commissions.map((value, index) => ({
                     ...value,
                     selected: value.score >= 1,
                     toggleSelected: () => this.toggleSelected(index),
@@ -84,7 +85,7 @@ class Site extends Component {
         const url = this.state.url;
 
         if (url.match(urlValidationRegex)) {
-            const { subreddit, threadId } = RedditFilter.urlToSubredditAndId(
+            const { subreddit, threadId } = RedditProvider.urlToSubredditAndId(
                 url
             );
             if (!subreddit || !threadId) {

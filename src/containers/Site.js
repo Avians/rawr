@@ -1,3 +1,4 @@
+import { AddSubmission, UrlBar } from "components";
 import {
     Container,
     Divider,
@@ -15,7 +16,6 @@ import { ImgurProvider } from "../providers/imgur/imgur";
 import { RedditProvider } from "providers/reddit/reddit";
 import { SelectionGrid } from "containers";
 import UploadButton from "components/UploadButton";
-import { UrlBar } from "components";
 
 const urlValidationRegex = /[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/gi;
 
@@ -63,6 +63,24 @@ class Site extends Component {
             });
         }
     }
+
+    onManualAdd = (link, requested, fulfilled) => {
+        const results = this.state.results;
+
+        this.setState({
+            results: [
+                ...results,
+                {
+                    image: link,
+                    requested_by: requested,
+                    fulfilled_by: fulfilled,
+                    score: 1,
+                    selected: true,
+                    toggleSelected: () => this.toggleSelected(results.length),
+                },
+            ],
+        });
+    };
 
     toggleSelected = index => {
         const results = this.state.results;
@@ -181,10 +199,19 @@ class Site extends Component {
                     onActionClick={this.handleUrlLoad}
                     onKeyPress={this.handleKeyPress}
                 />
+
                 {this.state.results.length > 0 && (
                     <>
                         <Divider horizontal>Fulfilled Requests</Divider>
                         <SelectionGrid data={this.state.results} />
+                    </>
+                )}
+
+                <br />
+                <AddSubmission onAdded={this.onManualAdd} />
+
+                {this.state.results.length > 0 && (
+                    <>
                         <Divider horizontal>Upload</Divider>
                         <Input
                             fluid

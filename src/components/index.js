@@ -1,4 +1,5 @@
-import UrlBar from "./UrlBar";
+import { AddSubmission } from "./AddSubmission";
 import SubmissionPreview from "./SubmissionPreview";
+import UrlBar from "./UrlBar";
 
-export { UrlBar, SubmissionPreview };
+export { UrlBar, SubmissionPreview, AddSubmission };

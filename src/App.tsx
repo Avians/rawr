@@ -1,14 +1,8 @@
-import "./App.css";
-
-import { Button } from "@material-ui/core";
+import Rawr from "./views/Rawr";
 import React from "react";
 
 const App: React.FC = () => {
-    return (
-        <Button variant="contained" color="primary">
-            RAWR
-        </Button>
-    );
+    return <Rawr />;
 };
 
 export default App;

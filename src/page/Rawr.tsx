@@ -1,5 +1,5 @@
 import { Container, Grid } from "@material-ui/core";
-import { useStoreActions, useStoreState } from "../store/store";
+import { useStoreActions, useStoreState } from "../redux/store";
 
 import React from "react";
 import { SearchBar } from "../component/SearchBar";

@@ -34,6 +34,18 @@ export const storeModel: StoreModel = {
                 imageLink: "https://files.catbox.moe/14fvh7.png",
                 score: 1000,
             },
+            {
+                requestedBy: "Zain",
+                fulfilledBy: "Matthijs",
+                imageLink: "https://files.catbox.moe/14fvh7.png",
+                score: 1000,
+            },
+            {
+                requestedBy: "Zain",
+                fulfilledBy: "Matthijs",
+                imageLink: "https://files.catbox.moe/14fvh7.png",
+                score: 1000,
+            },
         ],
         selectedResults: [0],
         toggleSelection: action((state, index) => {

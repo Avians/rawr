@@ -1,4 +1,4 @@
-import { Container, Grid } from "@material-ui/core";
+import { Container, Grid, Typography } from "@material-ui/core";
 import { useStoreActions, useStoreState } from "../redux/store";
 
 import { ImageCard } from "../component/ImageCard";
@@ -15,8 +15,13 @@ const Rawr: React.FC = () => {
     );
 
     return (
-        <Container maxWidth="md">
-            <Grid container spacing={2}>
+        <Container maxWidth="lg">
+            <Grid container spacing={3} justify="center">
+                <Grid item>
+                    <br />
+                    <Typography variant="h4">RAWR</Typography>
+                </Grid>
+
                 <Grid item xs={12}>
                     <SearchBar
                         disabled={searchState.isLoading}

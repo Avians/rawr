@@ -17,7 +17,7 @@ const useStyles = makeStyles(
             maxWidth: 350,
         },
         media: {
-            height: 140,
+            height: 180,
         },
         selectArea: {
             justifyContent: "center",

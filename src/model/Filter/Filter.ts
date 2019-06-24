@@ -7,7 +7,7 @@ export function AggregateFilter<DataModel>(
   return {
     predicate(model: DataModel): boolean {
       for (const predicate of predicates) {
-        if (predicate(model) == false) return false;
+        if (predicate(model) === false) return false;
       }
       return true;
     }

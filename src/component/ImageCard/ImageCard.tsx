@@ -1,3 +1,5 @@
+import { Dialog, DialogContent, DialogTitle } from "@material-ui/core";
+import React, { useState } from "react";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 
 import Card from "@material-ui/core/Card";
@@ -6,7 +8,6 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import { ImageRequestModel } from "../../model/ImageRequestModel";
-import React from "react";
 import Typography from "@material-ui/core/Typography";
 
 const useStyles = makeStyles(
@@ -34,13 +35,21 @@ export const ImageCard: React.FC<ImageCardProps> = props => {
     const classes = useStyles();
     const { imageRequestModel, isSelected, onSelectClick } = props;
 
+    const [openModal, setOpenModal] = useState(false);
+
     return (
         <Card className={classes.card} raised={isSelected}>
-            <CardActionArea>
+            <ImageCardModal
+                imageLink={imageRequestModel.imageLink}
+                open={openModal}
+                onClose={() => setOpenModal(false)}
+            />
+
+            <CardActionArea onClick={() => setOpenModal(true)}>
                 <CardMedia
                     className={classes.media}
                     image={imageRequestModel.imageLink}
-                    title="Contemplative Reptile"
+                    title={imageRequestModel.imageLink}
                 />
             </CardActionArea>
 
@@ -55,6 +64,7 @@ export const ImageCard: React.FC<ImageCardProps> = props => {
                     <b>Score</b>: {imageRequestModel.score}
                 </Typography>
             </CardContent>
+
             <CardActionArea
                 onClick={() => {
                     if (onSelectClick) onSelectClick();
@@ -67,5 +77,26 @@ export const ImageCard: React.FC<ImageCardProps> = props => {
                 </CardActions>
             </CardActionArea>
         </Card>
+    );
+};
+
+const ImageCardModal: React.FC<{
+    imageLink: string;
+    open: boolean;
+    onClose: () => void;
+}> = props => {
+    const { imageLink, open, onClose } = props;
+
+    return (
+        <Dialog open={open} onClose={onClose} scroll="body" maxWidth="xl">
+            <DialogTitle>Test</DialogTitle>
+            <DialogContent>
+                <img
+                    src={imageLink}
+                    alt={imageLink}
+                    style={{ width: "100%", height: "auto" }}
+                />
+            </DialogContent>
+        </Dialog>
     );
 };

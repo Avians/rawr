@@ -1,6 +1,15 @@
-import {Filter} from './Filter';
 import {ImageRequestModel} from '../ImageRequestModel';
 
-export interface ImageRequestFilter extends Filter<ImageRequestModel> {
-  predicate(model: ImageRequestModel): boolean;
+export const ImageRequestFilters = {
+  ScoreGreaterThan: (score: number) => {
+    return (model: ImageRequestModel) => {
+      return model.score >= score;
+    }
+  },
+
+  ScoreLowerThan: (score: number) => {
+    return (model: ImageRequestModel) => {
+      return model.score <= score;
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import { AggregateFilter, ImageRequestFilter } from "../model/Filter";
+import { AggregateFilter, ImageRequestFilters } from "../model/Filter";
 import { Container, Grid, Typography } from "@material-ui/core";
 import { useStoreActions, useStoreState } from "../redux/store";
 
@@ -16,14 +16,10 @@ const Rawr: React.FC = () => {
         actions => actions.imageRequestResults.toggleSelection
     );
 
-    const filters = AggregateFilter<ImageRequestModel>([
-        {
-            predicate: (model: ImageRequestModel) => model.score >= 100,
-        },
-        {
-            predicate: (model: ImageRequestModel) => model.score <= 300,
-        },
-    ]);
+    const filters = AggregateFilter<ImageRequestModel>(
+        ImageRequestFilters.ScoreGreaterThan(100),
+        ImageRequestFilters.ScoreLowerThan(300)
+    );
 
     return (
         <Container maxWidth="lg">

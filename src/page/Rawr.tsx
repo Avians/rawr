@@ -1,25 +1,30 @@
-import { AggregateFilter, ImageRequestFilters } from "../model/Filter";
 import { Container, Grid, Typography } from "@material-ui/core";
 import { useStoreActions, useStoreState } from "../redux/store";
 
+import { AggregateFilter } from "../model/Filter";
 import { ImageCard } from "../component/ImageCard";
 import { ImageRequestModel } from "../model/ImageRequestModel";
 import React from "react";
-import { SearchBar } from "../component/SearchBar";
+import { SearchView } from "../views/SearchView";
 
 const Rawr: React.FC = () => {
-    const searchState = useStoreState(state => state.searchModel);
-    const search = useStoreActions(actions => actions.searchModel.search);
+    const state = {
+        images: useStoreState(state => state.imageRequestResults),
+        filters: useStoreState(
+            state => state.filterModel.activeImageResultFilters
+        ),
+    };
+    const actions = {
+        toggleImageSelection: useStoreActions(
+            actions => actions.imageRequestResults.toggleSelection
+        ),
+    };
 
-    const imageResultState = useStoreState(state => state.imageRequestResults);
-    const imageToggleSelection = useStoreActions(
-        actions => actions.imageRequestResults.toggleSelection
-    );
-
-    const filters = AggregateFilter<ImageRequestModel>(
-        ImageRequestFilters.ScoreGreaterThan(100),
-        ImageRequestFilters.ScoreLowerThan(300)
-    );
+    const filter = () => {
+        return AggregateFilter<ImageRequestModel>(
+            ...state.filters.map(filter => filter.predicate)
+        );
+    };
 
     return (
         <Container maxWidth="lg">
@@ -30,29 +35,24 @@ const Rawr: React.FC = () => {
                 </Grid>
 
                 <Grid item xs={12}>
-                    <SearchBar
-                        disabled={searchState.isLoading}
-                        onSearchClicked={input => search(input)}
-                    />
+                    <SearchView />
                 </Grid>
 
-                {imageResultState.results
-                    .filter(filters.predicate)
-                    .map((imageResult, index) => {
-                        return (
-                            <Grid item key={index}>
-                                <ImageCard
-                                    imageRequestModel={imageResult}
-                                    isSelected={imageResultState.selectedResults.includes(
-                                        index
-                                    )}
-                                    onSelectClick={() => {
-                                        imageToggleSelection(index);
-                                    }}
-                                />
-                            </Grid>
-                        );
-                    })}
+                {state.images.results
+                    .filter(filter().predicate)
+                    .map((imageResult, index) => (
+                        <Grid item key={index}>
+                            <ImageCard
+                                imageRequestModel={imageResult}
+                                isSelected={state.images.selectedResults.includes(
+                                    index
+                                )}
+                                onSelectClick={() => {
+                                    actions.toggleImageSelection(index);
+                                }}
+                            />
+                        </Grid>
+                    ))}
             </Grid>
         </Container>
     );

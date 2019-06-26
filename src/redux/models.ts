@@ -65,7 +65,7 @@ export const storeModel: StoreModel = {
                 state.selectedResults = [...state.selectedResults, index];
             } else {
                 state.selectedResults = state.selectedResults.filter(
-                    i => i !== index
+                    i => i !== index,
                 );
             }
         }),
@@ -84,7 +84,7 @@ export const storeModel: StoreModel = {
         }),
         removeImageResultFilter: action((state, filter) => {
             state.activeImageResultFilters = state.activeImageResultFilters.filter(
-                oldFilter => oldFilter === filter
+                oldFilter => oldFilter === filter,
             );
         }),
     },

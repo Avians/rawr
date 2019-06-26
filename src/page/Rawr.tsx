@@ -11,18 +11,18 @@ const Rawr: React.FC = () => {
     const state = {
         images: useStoreState(state => state.imageRequestResults),
         filters: useStoreState(
-            state => state.filterModel.activeImageResultFilters
+            state => state.filterModel.activeImageResultFilters,
         ),
     };
     const actions = {
         toggleImageSelection: useStoreActions(
-            actions => actions.imageRequestResults.toggleSelection
+            actions => actions.imageRequestResults.toggleSelection,
         ),
     };
 
-    const filter = () => {
+    const activeFilters = () => {
         return AggregateFilter<ImageRequestModel>(
-            ...state.filters.map(filter => filter.predicate)
+            ...state.filters,
         );
     };
 
@@ -30,22 +30,22 @@ const Rawr: React.FC = () => {
         <Container maxWidth="lg">
             <Grid container spacing={3} justify="center">
                 <Grid item>
-                    <br />
+                    <br/>
                     <Typography variant="h4">RAWR</Typography>
                 </Grid>
 
                 <Grid item xs={12}>
-                    <SearchView />
+                    <SearchView/>
                 </Grid>
 
                 {state.images.results
-                    .filter(filter().predicate)
+                    .filter(activeFilters())
                     .map((imageResult, index) => (
                         <Grid item key={index}>
                             <ImageCard
                                 imageRequestModel={imageResult}
                                 isSelected={state.images.selectedResults.includes(
-                                    index
+                                    index,
                                 )}
                                 onSelectClick={() => {
                                     actions.toggleImageSelection(index);

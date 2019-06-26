@@ -1,9 +1,10 @@
 import { useStoreActions, useStoreState } from "../../redux/store";
 
-import { ImageRequestFilters } from "../../model/Filter";
+import { ImageRequestFilters, PredicateHoc } from "../../model/Filter";
 import { NumberFilter } from "../../component/Filter";
 import React from "react";
 import { SearchBar } from "../../component/SearchBar";
+import { ImageRequestModel } from "../../model/ImageRequestModel";
 
 export const SearchView: React.FC = () => {
     const state = {
@@ -11,32 +12,22 @@ export const SearchView: React.FC = () => {
     };
     const actions = {
         search: useStoreActions(actions => actions.searchModel.search),
-        addFilter: useStoreActions(
-            actions => actions.filterModel.addImageResultFilter,
-        ),
-        removeFilter: useStoreActions(
-            actions => actions.filterModel.removeImageResultFilter,
-        ),
+        addFilter: useStoreActions(actions => actions.filterModel.addImageResultFilter),
+        removeFilter: useStoreActions(actions => actions.filterModel.removeImageResultFilter),
     };
 
     // get rid of type error on predicate
-    const updateFilter = (prev: string, cur: string, predicate: any) => {
+    const updateFilter = (prev: string, cur: string, predicate: PredicateHoc<ImageRequestModel>) => {
         const [prevVal, curVal] = [Number(prev), Number(cur)];
 
         // Filter has been emptied out, aka do not use a filter
         if (cur.length === 0) {
-            actions.removeFilter({
-                predicate: predicate(prevVal),
-            });
+            actions.removeFilter(predicate(prevVal));
             return;
         }
 
-        actions.removeFilter({
-            predicate: predicate(prevVal),
-        });
-        actions.addFilter({
-            predicate: predicate(curVal),
-        });
+        actions.removeFilter(predicate(prevVal));
+        actions.addFilter(predicate(curVal));
     };
 
     return (
@@ -48,11 +39,7 @@ export const SearchView: React.FC = () => {
             <NumberFilter
                 label={"Score greater than"}
                 onValueChanged={(prev, cur) => {
-                    updateFilter(
-                        prev,
-                        cur,
-                        ImageRequestFilters.ScoreGreaterThan,
-                    );
+                    updateFilter(prev, cur, ImageRequestFilters.ScoreGreaterThan);
                 }}
             />
             <NumberFilter

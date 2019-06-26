@@ -2,20 +2,18 @@ import { ImageRequestModel } from "../ImageRequestModel";
 import { Predicate, PredicateHoc } from "./Filter";
 
 export interface ImageRequestFiltersType {
-    ScoreGreaterThan: PredicateHoc
-    ScoreLowerThan: PredicateHoc
+    ScoreGreaterThan: PredicateHoc<ImageRequestModel>;
+    ScoreLowerThan: PredicateHoc<ImageRequestModel>;
 }
 
 export const ImageRequestFilters: ImageRequestFiltersType = {
-    ScoreGreaterThan: (score: number): Predicate => {
-        return (model: ImageRequestModel) => {
+    ScoreGreaterThan: (score: number): Predicate<ImageRequestModel> =>
+        (model: ImageRequestModel) => {
             return model.score >= score;
-        };
-    },
+        },
 
-    ScoreLowerThan: (score: number): Predicate => {
-        return (model: ImageRequestModel) => {
+    ScoreLowerThan: (score: number): Predicate<ImageRequestModel> =>
+        (model: ImageRequestModel) => {
             return model.score <= score;
-        };
-    },
+        },
 };

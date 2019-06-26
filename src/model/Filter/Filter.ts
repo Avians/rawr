@@ -1,3 +1,6 @@
+export type Predicate = (model: any) => boolean;
+export type PredicateHoc = (...args: any[]) => Predicate;
+
 export interface Filter<DataModel> {
     predicate(model: DataModel): boolean;
 }

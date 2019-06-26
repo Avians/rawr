@@ -12,10 +12,10 @@ export const SearchView: React.FC = () => {
     const actions = {
         search: useStoreActions(actions => actions.searchModel.search),
         addFilter: useStoreActions(
-            actions => actions.filterModel.addImageResultFilter
+            actions => actions.filterModel.addImageResultFilter,
         ),
         removeFilter: useStoreActions(
-            actions => actions.filterModel.removeImageResultFilter
+            actions => actions.filterModel.removeImageResultFilter,
         ),
     };
 
@@ -51,7 +51,7 @@ export const SearchView: React.FC = () => {
                     updateFilter(
                         prev,
                         cur,
-                        ImageRequestFilters.ScoreGreaterThan
+                        ImageRequestFilters.ScoreGreaterThan,
                     );
                 }}
             />

@@ -20,11 +20,12 @@ const useStyles = makeStyles(
         iconButton: {
             padding: 10,
         },
-    })
+    }),
 );
 
 interface SearchBarProps {
-    onSearchClicked: (inputText: string) => void;
+    onValueChanged: (input: string) => void;
+    onSearchClicked: () => void;
     disabled?: boolean;
 }
 
@@ -32,7 +33,7 @@ export const SearchBar: React.FC<SearchBarProps> = props => {
     const [textInput, setTextInput] = useState("");
 
     const classes = useStyles();
-    const { onSearchClicked, disabled } = props;
+    const { onValueChanged, onSearchClicked, disabled } = props;
 
     return (
         <Paper className={classes.root}>
@@ -41,19 +42,23 @@ export const SearchBar: React.FC<SearchBarProps> = props => {
                 placeholder="Enter Reddit Thread"
                 inputProps={{ "aria-label": "Enter Reddit Thread" }}
                 value={textInput}
-                onChange={e => setTextInput(e.target.value)}
+                onChange={e => {
+                    setTextInput(e.target.value);
+                    onValueChanged(e.target.value);
+                }}
                 onKeyPress={e => {
-                    e.key === "Enter" && onSearchClicked(textInput);
+                    e.key === "Enter" && onSearchClicked();
                 }}
                 disabled={disabled}
             />
+
             <IconButton
                 className={classes.iconButton}
                 aria-label="Search"
-                onClick={() => onSearchClicked(textInput)}
+                onClick={() => onSearchClicked()}
                 disabled={disabled}
             >
-                <SearchIcon />
+                <SearchIcon/>
             </IconButton>
         </Paper>
     );

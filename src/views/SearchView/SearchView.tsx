@@ -11,12 +11,12 @@ export const SearchView: React.FC = () => {
         search: useStoreState(store => store.searchModel),
     };
     const actions = {
-        search: useStoreActions(actions => actions.searchModel.search),
+        search: useStoreActions(actions => actions.searchModel.updateSearchUrl),
         addFilter: useStoreActions(actions => actions.filterModel.addImageResultFilter),
         removeFilter: useStoreActions(actions => actions.filterModel.removeImageResultFilter),
+        fetchResults: useStoreActions(actions => actions.imageRequestResults.fetchRedditThread),
     };
 
-    // get rid of type error on predicate
     const updateFilter = (prev: string, cur: string, predicate: PredicateHoc<ImageRequestModel>) => {
         const [prevVal, curVal] = [Number(prev), Number(cur)];
 
@@ -34,7 +34,10 @@ export const SearchView: React.FC = () => {
         <>
             <SearchBar
                 disabled={state.search.isLoading}
-                onSearchClicked={input => actions.search(input)}
+                onValueChanged={(input) => actions.search(input)}
+                onSearchClicked={() => {
+                    actions.fetchResults(state.search.url);
+                }}
             />
             <NumberFilter
                 label={"Score greater than"}

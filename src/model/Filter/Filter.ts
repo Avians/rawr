@@ -11,4 +11,4 @@ export function AggregateFilter<DataModel>(
     return (model: DataModel): boolean => {
         return predicates.every(predicate => predicate(model));
     };
-};
+}

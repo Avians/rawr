@@ -45,10 +45,10 @@ const Rawr: React.FC = () => {
                             <ImageCard
                                 imageRequestModel={imageResult}
                                 isSelected={state.images.selectedResults.includes(
-                                    index,
+                                    state.images.results.indexOf(imageResult),
                                 )}
                                 onSelectClick={() => {
-                                    actions.toggleImageSelection(index);
+                                    actions.toggleImageSelection(state.images.results.indexOf(imageResult));
                                 }}
                             />
                         </Grid>

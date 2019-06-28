@@ -5,8 +5,10 @@ import { ImageRequestModel } from "../model/ImageRequestModel";
 import { Reddit } from "../api/Reddit";
 import { AsImageModels } from "../api/Conversions/RedditToImageModel";
 
+export type IsSelected = { isSelected: boolean };
+
 export interface ImageRequestResults {
-    results: ImageRequestModel[];
+    results: (ImageRequestModel & IsSelected)[];
     selectedResults: number[];
     toggleSelection: Action<ImageRequestResults, number>;
 
@@ -39,17 +41,11 @@ export const storeModel: StoreModel = {
         results: [],
         selectedResults: [],
         toggleSelection: action((state, index) => {
-            if (state.selectedResults.indexOf(index) === -1) {
-                state.selectedResults = [...state.selectedResults, index];
-            } else {
-                state.selectedResults = state.selectedResults.filter(
-                    i => i !== index,
-                );
-            }
+            state.results[index].isSelected = !state.results[index].isSelected;
         }),
 
         addImageRequest: action((state, imageRequest) => {
-            state.results.push(imageRequest);
+            state.results.push({ ...imageRequest, isSelected: false });
         }),
         resetImages: action(state => {
             state.results = [];
@@ -59,9 +55,10 @@ export const storeModel: StoreModel = {
         fetchRedditThread: thunk(async (actions, redditUrl) => {
             const redditThread = await Reddit.getRedditThread(redditUrl);
             actions.resetImages();
-            AsImageModels(redditThread).forEach(comment => {
-                actions.addImageRequest(comment);
-            });
+            AsImageModels(redditThread)
+                .forEach(comment => {
+                    actions.addImageRequest(comment);
+                });
         }),
     },
     searchModel: {

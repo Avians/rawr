@@ -2,9 +2,9 @@ import { Container, Grid, Typography } from "@material-ui/core";
 import { useStoreActions, useStoreState } from "../redux/store";
 
 import { AggregateFilter } from "../model/Filter";
-import { ImageCard } from "../component/ImageCard";
+import { ImageCard, ImageCardModal } from "../component/ImageCard";
 import { ImageRequestModel } from "../model/ImageRequestModel";
-import React from "react";
+import React, { useState } from "react";
 import { SearchView } from "../views/SearchView";
 
 const Rawr: React.FC = () => {
@@ -26,6 +26,9 @@ const Rawr: React.FC = () => {
         );
     };
 
+    const [openModal, setOpenModal] = useState(false);
+    const [previewImage, setPreviewImage] = useState("");
+
     return (
         <Container maxWidth="lg">
             <Grid container spacing={3} justify="center">
@@ -41,19 +44,22 @@ const Rawr: React.FC = () => {
                 {state.images.results
                     .filter(activeFilters())
                     .map((imageResult, index) => (
-                        <Grid item key={index}>
+                        <Grid item key={imageResult.imageLink}>
                             <ImageCard
                                 imageRequestModel={imageResult}
-                                isSelected={state.images.selectedResults.includes(
-                                    state.images.results.indexOf(imageResult),
-                                )}
+                                isSelected={imageResult.isSelected}
                                 onSelectClick={() => {
-                                    actions.toggleImageSelection(state.images.results.indexOf(imageResult));
+                                    actions.toggleImageSelection(index);
+                                }}
+                                onImageClick={() => {
+                                    setPreviewImage(imageResult.imageLink);
+                                    setOpenModal(true);
                                 }}
                             />
                         </Grid>
                     ))}
             </Grid>
+            <ImageCardModal imageLink={previewImage} open={openModal} onClose={() => setOpenModal(false)}/>
         </Container>
     );
 };

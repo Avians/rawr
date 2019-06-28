@@ -11,7 +11,7 @@ const sanitizeUrlAsImage = (url: string): ImageLink[] => {
     const tokens = url
         .split(/[[\]()]/g) // Split Markdown URLs by '[]()' and remove them
         .filter(url => url.length !== 0) // Remove empty urls
-        //.filter(url => ["jpg", "jpeg", "png"].some(extension => url.endsWith(extension))) // Check for valid extension
+        .filter(url => ["jpg", "jpeg", "png"].some(extension => url.endsWith(extension))) // Check for valid extension
         .filter((url, index, self) => self.indexOf(url) === index); // Remove duplicates
 
     return tokens.map(token => {

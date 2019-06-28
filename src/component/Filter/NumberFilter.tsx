@@ -14,7 +14,6 @@ export const NumberFilter: React.FC<NumberFilterProps> = props => {
 
     return (
         <TextField
-            id="outlined-number"
             label={label}
             value={value}
             onChange={e => {

@@ -3,6 +3,7 @@ import { Action, Thunk, action, thunk } from "easy-peasy";
 import { Filter } from "../model/Filter";
 import { ImageRequestModel } from "../model/ImageRequestModel";
 import { Reddit } from "../api/Reddit";
+import { AsImageModels } from "../api/Conversions/RedditToImageModel";
 
 export interface ImageRequestResults {
     results: ImageRequestModel[];
@@ -57,15 +58,9 @@ export const storeModel: StoreModel = {
 
         fetchRedditThread: thunk(async (actions, redditUrl) => {
             const redditThread = await Reddit.getRedditThread(redditUrl);
-
             actions.resetImages();
-            redditThread.rootComments.forEach(comment => {
-                actions.addImageRequest({
-                    requestedBy: comment.author,
-                    fulfilledBy: comment.body,
-                    score: comment.upVotes,
-                    imageLink: comment.permaLink,
-                });
+            AsImageModels(redditThread).forEach(comment => {
+                actions.addImageRequest(comment);
             });
         }),
     },

@@ -32,7 +32,7 @@ export const ImageGridView: React.FC = () => {
             {state.images.results
                 .filter(activeFilters())
                 .map((imageResult, index) => (
-                    <Grid item key={imageResult.imageLink}>
+                    <Grid item key={imageResult.imageLink} style={{ width: imageResult.isSelected ? "100%" : "" }}>
                         <ImageCard
                             imageRequestModel={imageResult}
                             isSelected={imageResult.isSelected}

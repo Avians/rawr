@@ -7,7 +7,7 @@ export type ImageLink = {
     type: "directLink" | "imgurAlbum";
 }
 
-const sanitizeUrlAsImage = (url: string): ImageLink[] => {
+const sanitizeUrlAsImage = (url: string): Array<ImageLink> => {
     const tokens = url
         .split(/[[\]()]/g) // Split Markdown URLs by '[]()' and remove them
         .filter(url => url.length !== 0) // Remove empty urls
@@ -25,7 +25,7 @@ const sanitizeUrlAsImage = (url: string): ImageLink[] => {
     );
 };
 
-const filterFromDepth = (comment: RedditComment, currentDepth: number): ImageRequestModel[] => {
+const filterFromDepth = (comment: RedditComment, currentDepth: number): Array<ImageRequestModel> => {
     let fulfilled: ImageRequestModel[] = [];
 
     const addImage = (comment: RedditComment, image: ImageLink) => {
@@ -48,7 +48,7 @@ const filterFromDepth = (comment: RedditComment, currentDepth: number): ImageReq
     return fulfilled;
 };
 
-export const AsImageModels = (thread: RedditThread): ImageRequestModel[] => {
+export const AsImageModels = (thread: RedditThread): Array<ImageRequestModel> => {
     let results: ImageRequestModel[] = [];
 
     for (const root of thread.rootComments) {

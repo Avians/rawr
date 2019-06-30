@@ -10,12 +10,12 @@ export type IsSelected = {
 };
 
 export interface ImageRequestResults {
-    results: (ImageRequestModel & IsSelected)[];
-    selectedResults: number[];
+    results: Array<(ImageRequestModel & IsSelected)>;
+    selectedResults: Array<number>;
     toggleSelection: Action<ImageRequestResults, number>;
 
     addImageRequest: Action<ImageRequestResults, ImageRequestModel>;
-    addImageRequests: Action<ImageRequestResults, ImageRequestModel[]>;
+    addImageRequests: Action<ImageRequestResults, Array<ImageRequestModel>>;
     resetImages: Action<ImageRequestResults>;
 
     fetchRedditThread: Thunk<ImageRequestResults, string>;
@@ -28,7 +28,7 @@ export interface SearchModel {
 }
 
 export interface FilterModel {
-    activeImageResultFilters: Filter<ImageRequestModel>[];
+    activeImageResultFilters: Array<Filter<ImageRequestModel>>;
     addImageResultFilter: Action<FilterModel, Filter<ImageRequestModel>>;
     removeImageResultFilter: Action<FilterModel, Filter<ImageRequestModel>>;
 }

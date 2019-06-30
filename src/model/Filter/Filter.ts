@@ -6,7 +6,7 @@ export interface Filter<DataModel> {
 }
 
 export function AggregateFilter<DataModel>(
-    ...predicates: Predicate<DataModel>[]
+    ...predicates: Array<Predicate<DataModel>>
 ): Filter<DataModel> {
     return (model: DataModel): boolean => {
         return predicates.every(predicate => predicate(model));

@@ -24,7 +24,7 @@ export const ImageCard: React.FC<ImageCardProps> = props => {
     return (
         <Card style={{
             minWidth: 300,
-            maxWidth: 350,
+            width: isSelected ? "100%" : "100%",
         }} raised={isSelected}>
             <CardActionArea onClick={() => {
                 if (onImageClick) onImageClick();

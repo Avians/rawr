@@ -6,6 +6,7 @@ import React from "react";
 import { SearchBar } from "../../component/SearchBar";
 import { ImageRequestModel } from "../../model/ImageRequestModel";
 
+
 export const SearchView: React.FC = () => {
     const state = {
         search: useStoreState(store => store.searchModel),

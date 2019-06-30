@@ -20,6 +20,7 @@ interface ImageCardProps {
 
 export const ImageCard: React.FC<ImageCardProps> = props => {
     const { imageRequestModel, isSelected, onSelectClick, onImageClick } = props;
+
     return (
         <Card style={{
             minWidth: 300,
@@ -28,13 +29,16 @@ export const ImageCard: React.FC<ImageCardProps> = props => {
             <CardActionArea onClick={() => {
                 if (onImageClick) onImageClick();
             }}>
-                <CardMedia
-                    style={{
-                        height: 180,
-                    }}
-                    image={imageRequestModel.imageLink}
-                    title={imageRequestModel.imageLink}
-                />
+                <LazyLoad once>
+                    <CardMedia
+                        style={{
+                            height: 180,
+                        }}
+                        image={imageRequestModel.imageLink}
+                        title={imageRequestModel.imageLink}
+                    />
+                </LazyLoad>
+
             </CardActionArea>
 
             <CardContent>
@@ -49,13 +53,17 @@ export const ImageCard: React.FC<ImageCardProps> = props => {
                 </Typography>
             </CardContent>
 
-            <CardActions onClick={() => {
-                if (onSelectClick) onSelectClick();
-            }}>
-                <Typography variant="button" color="primary">
-                    {isSelected ? "Selected" : "Select"}
-                </Typography>
-            </CardActions>
+            <CardActionArea
+                onClick={() => {
+                    if (onSelectClick) onSelectClick();
+                }}
+            >
+                <CardActions style={{ justifyContent: "center" }}>
+                    <Typography variant="button" color="primary">
+                        {isSelected ? "Selected" : "Select"}
+                    </Typography>
+                </CardActions>
+            </CardActionArea>
         </Card>
     );
 };
@@ -74,13 +82,13 @@ export const ImageCardModal: React.FC<{
         <Dialog open={open} onClose={onClose} scroll="body" maxWidth="xl" keepMounted={true}>
             <DialogTitle>Test</DialogTitle>
             <DialogContent>
-                <LazyLoad>
-                    <img
-                        src={imageLink}
-                        alt={imageLink}
-                        style={{ width: "100%", height: "auto" }}
-                    />
-                </LazyLoad>
+                {/*<LazyLoad>*/}
+                {/*    <img*/}
+                {/*        src={imageLink}*/}
+                {/*        alt={imageLink}*/}
+                {/*        style={{ width: "100%", height: "auto" }}*/}
+                {/*    />*/}
+                {/*</LazyLoad>*/}
             </DialogContent>
         </Dialog>
     );

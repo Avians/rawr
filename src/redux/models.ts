@@ -1,11 +1,13 @@
 import { Action, Thunk, action, thunk } from "easy-peasy";
 
+import { AsImageModels } from "../api/Conversions/RedditToImageModel";
 import { Filter } from "../model/Filter";
 import { ImageRequestModel } from "../model/ImageRequestModel";
 import { Reddit } from "../api/Reddit";
-import { AsImageModels } from "../api/Conversions/RedditToImageModel";
 
-export type IsSelected = { isSelected: boolean };
+export type IsSelected = {
+    isSelected: boolean
+};
 
 export interface ImageRequestResults {
     results: (ImageRequestModel & IsSelected)[];
@@ -13,6 +15,7 @@ export interface ImageRequestResults {
     toggleSelection: Action<ImageRequestResults, number>;
 
     addImageRequest: Action<ImageRequestResults, ImageRequestModel>;
+    addImageRequests: Action<ImageRequestResults, ImageRequestModel[]>;
     resetImages: Action<ImageRequestResults>;
 
     fetchRedditThread: Thunk<ImageRequestResults, string>;
@@ -45,7 +48,16 @@ export const storeModel: StoreModel = {
         }),
 
         addImageRequest: action((state, imageRequest) => {
-            state.results.push({ ...imageRequest, isSelected: false });
+            state.results = [...state.results, { ...imageRequest, isSelected: false }];
+        }),
+        addImageRequests: action((state, imageRequests) => {
+            state.results = [
+                ...state.results, ...imageRequests.map(imageRequest => {
+                    return {
+                        ...imageRequest, isSelected: false,
+                    };
+                }),
+            ];
         }),
         resetImages: action(state => {
             state.results = [];
@@ -53,12 +65,10 @@ export const storeModel: StoreModel = {
         }),
 
         fetchRedditThread: thunk(async (actions, redditUrl) => {
-            const redditThread = await Reddit.getRedditThread(redditUrl);
             actions.resetImages();
-            AsImageModels(redditThread)
-                .forEach(comment => {
-                    actions.addImageRequest(comment);
-                });
+
+            const thread = await Reddit.getRedditThread(redditUrl);
+            actions.addImageRequests(AsImageModels(thread));
         }),
     },
     searchModel: {
@@ -71,11 +81,14 @@ export const storeModel: StoreModel = {
     filterModel: {
         activeImageResultFilters: [],
         addImageResultFilter: action((state, filter) => {
-            state.activeImageResultFilters.push(filter);
+            state.activeImageResultFilters = [...state.activeImageResultFilters, filter];
+
         }),
         removeImageResultFilter: action((state, filter) => {
+
             state.activeImageResultFilters = state.activeImageResultFilters.filter(
-                oldFilter => oldFilter === filter,
+                // cant use == or ===
+                oldFilter => oldFilter.toString() !== filter.toString(),
             );
         }),
     },

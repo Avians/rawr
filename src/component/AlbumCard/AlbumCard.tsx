@@ -1,5 +1,4 @@
-import { Dialog, DialogContent, DialogTitle } from "@material-ui/core";
-import React from "react";
+import React, { useState } from "react";
 
 import Card from "@material-ui/core/Card";
 import CardActionArea from "@material-ui/core/CardActionArea";
@@ -9,19 +8,22 @@ import CardMedia from "@material-ui/core/CardMedia";
 import LazyLoad from "react-lazyload";
 import Typography from "@material-ui/core/Typography";
 
-interface ImageCardProps {
-    imageLink: string;
+interface AlbumCardProps {
+    albumLink: string;
+    imageLinks: string[];
     isSelected?: boolean;
     onImageClick?: () => void;
     onSelectClick?: () => void;
 }
 
-export const ImageCard: React.FC<ImageCardProps> = props => {
-    const { imageLink, isSelected, onSelectClick, onImageClick } = props;
+export const AlbumCard: React.FC<AlbumCardProps> = props => {
+    const { albumLink, imageLinks, isSelected, onSelectClick, onImageClick } = props;
+    const [expanded, setExpanded] = useState(false);
 
     return (
         <Card style={{
             minWidth: 300,
+            width: isSelected ? "100%" : "100%",
         }} raised={isSelected}>
             <CardActionArea onClick={() => {
                 if (onImageClick) onImageClick();
@@ -31,8 +33,8 @@ export const ImageCard: React.FC<ImageCardProps> = props => {
                         style={{
                             height: 180,
                         }}
-                        image={imageLink}
-                        title={imageLink}
+                        image={imageLinks[0]}
+                        title={imageLinks[0]}
                     />
                 </LazyLoad>
 
@@ -49,38 +51,11 @@ export const ImageCard: React.FC<ImageCardProps> = props => {
             >
                 <CardActions style={{ justifyContent: "center" }}>
                     <Typography variant="button" color="primary">
-                        {isSelected ? "Selected" : "Select"}
+                        {isSelected ? "Select All" : "Select"}
                     </Typography>
+
                 </CardActions>
             </CardActionArea>
         </Card>
-    );
-};
-
-export const ImageCardModal: React.FC<{
-    imageLink: string;
-    open: boolean;
-    onClose: () => void;
-}> = props => {
-    const { imageLink, open, onClose } = props;
-
-    return (
-        <Dialog open={open} onClose={onClose} scroll="body" maxWidth="xl" keepMounted={true}>
-            <DialogTitle>{imageLink}</DialogTitle>
-            <DialogContent>
-                <LazyLoad>
-                    <img
-                        src={imageLink}
-                        alt={imageLink}
-                        style={{
-                            // keep image inside browser window
-                            // without having to scroll
-                            maxWidth: window.innerWidth * 0.8,
-                            maxHeight: window.innerHeight * 0.8,
-                        }}
-                    />
-                </LazyLoad>
-            </DialogContent>
-        </Dialog>
     );
 };

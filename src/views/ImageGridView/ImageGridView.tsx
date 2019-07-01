@@ -15,7 +15,7 @@ export const ImageGridView: React.FC = () => {
     };
     const actions = {
         toggleImageSelection: useStoreActions(
-            actions => actions.imageRequestResults.toggleSelection,
+            actions => actions.imageRequestResults.toggleImageSelection,
         ),
     };
 
@@ -32,7 +32,7 @@ export const ImageGridView: React.FC = () => {
         <Grid container spacing={3} justify={"space-evenly"}>
             <ImageCardModal imageLink={previewImage} open={openModal} onClose={() => setOpenModal(false)}/>
 
-            {state.images.results
+            {state.images.imageResults
                 .filter(activeFilters())
                 .map((imageResult, index) => (
                     <Grid item key={imageResult.imageLink}>

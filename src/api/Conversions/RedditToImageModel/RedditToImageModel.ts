@@ -48,7 +48,6 @@ const recursiveFindImagesByDepth = (comment: RedditComment, currentDepth: number
         if (image.type === "direct") {
             fulfilled.push({
                 type: "image",
-
                 fulfilledBy: comment.author,
                 requestedBy: "",
                 imageLink: image.link,

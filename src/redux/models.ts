@@ -4,18 +4,28 @@ import { AsImageModels } from "../api/Conversions/RedditToImageModel";
 import { Filter } from "../model/Filter";
 import { ImageRequestModel } from "../model/ImageRequestModel";
 import { Reddit } from "../api/Reddit";
+import { AlbumRequestModel } from "../model/AlbumRequestModel";
 
-export type Selectable = {
+type Selectable = {
     isSelected: boolean
 };
 
+type Image = (ImageRequestModel & Selectable);
+type Album = (AlbumRequestModel & { selectedLinks: Map<string, Selectable> });
+
 export interface ImageRequestResults {
-    results: Array<(ImageRequestModel & Selectable)>;
-    selectedResults: Array<number>;
-    toggleSelection: Action<ImageRequestResults, number>;
+    imageResults: Array<Image>;
+    toggleImageSelection: Action<ImageRequestResults, number>;
+
+    albumResults: Array<Album>;
+    toggleAlbumSelection: Action<ImageRequestResults, [number, string]>;
 
     addImageRequest: Action<ImageRequestResults, ImageRequestModel>;
     addImageRequests: Action<ImageRequestResults, Array<ImageRequestModel>>;
+
+    addAlbumRequest: Action<ImageRequestResults, AlbumRequestModel>;
+    addAlbumRequests: Action<ImageRequestResults, Array<AlbumRequestModel>>;
+
     resetImages: Action<ImageRequestResults>;
 
     fetchRedditThread: Thunk<ImageRequestResults, string>;
@@ -41,27 +51,54 @@ export interface StoreModel {
 
 export const storeModel: StoreModel = {
     imageRequestResults: {
-        results: [],
-        selectedResults: [],
-        toggleSelection: action((state, index) => {
-            state.results[index].isSelected = !state.results[index].isSelected;
+        imageResults: [],
+        toggleImageSelection: action((state, index) => {
+            state.imageResults[index].isSelected = !state.imageResults[index].isSelected;
         }),
 
+        albumResults: [],
+        toggleAlbumSelection: action((state, [index, link]) => {
+            state.albumResults[index].selectedLinks.set(link, {
+                isSelected: !state.albumResults[index].selectedLinks.get(link),
+            });
+        }),
+
+
         addImageRequest: action((state, imageRequest) => {
-            state.results = [...state.results, { ...imageRequest, isSelected: false }];
+            state.imageResults = [...state.imageResults, { ...imageRequest, isSelected: false, type: "image" }];
         }),
         addImageRequests: action((state, imageRequests) => {
-            state.results = [
-                ...state.results, ...imageRequests.map(imageRequest => {
+            state.imageResults = [
+                ...state.imageResults, ...imageRequests.map((imageRequest): Image => {
                     return {
-                        ...imageRequest, isSelected: false,
+                        ...imageRequest, isSelected: false, type: "image",
                     };
                 }),
             ];
         }),
+
+        addAlbumRequest: action((state, albumRequest) => {
+            state.albumResults = [...state.albumResults, {
+                ...albumRequest,
+                type: "album",
+                selectedLinks: new Map<string, Selectable>(),
+            }];
+        }),
+        addAlbumRequests: action((state, albumRequests) => {
+            state.albumResults = [
+                ...state.albumResults, ...albumRequests.map((albumRequest): Album => {
+                    return {
+                        ...albumRequest,
+                        type: "album",
+                        selectedLinks: new Map<string, Selectable>(),
+                    };
+                }),
+            ];
+        }),
+
         resetImages: action(state => {
-            state.results = [];
-            state.selectedResults = [];
+            state.imageResults = [];
+            state.albumResults = [];
         }),
 
         fetchRedditThread: thunk(async (actions, redditUrl) => {
@@ -74,6 +111,7 @@ export const storeModel: StoreModel = {
                         actions.addImageRequest(model);
                         break;
                     case "album":
+                        actions.addAlbumRequest(model);
                         break;
                 }
             });
@@ -93,7 +131,6 @@ export const storeModel: StoreModel = {
 
         }),
         removeImageResultFilter: action((state, filter) => {
-
             state.activeImageResultFilters = state.activeImageResultFilters.filter(
                 // cant use == or ===
                 oldFilter => oldFilter.toString() !== filter.toString(),

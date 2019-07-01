@@ -1,6 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from "@material-ui/core";
-import React, { useEffect, useState } from "react";
-import { createStyles, makeStyles } from "@material-ui/core/styles";
+import React from "react";
 
 import Card from "@material-ui/core/Card";
 import CardActionArea from "@material-ui/core/CardActionArea";
@@ -8,18 +7,17 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import LazyLoad from "react-lazyload";
-import { ImageRequestModel } from "../../model/ImageRequestModel";
 import Typography from "@material-ui/core/Typography";
 
 interface ImageCardProps {
-    imageRequestModel: ImageRequestModel;
+    imageLink: string;
     isSelected?: boolean;
     onImageClick?: () => void;
     onSelectClick?: () => void;
 }
 
 export const ImageCard: React.FC<ImageCardProps> = props => {
-    const { imageRequestModel, isSelected, onSelectClick, onImageClick } = props;
+    const { imageLink, isSelected, onSelectClick, onImageClick } = props;
 
     return (
         <Card style={{
@@ -34,23 +32,15 @@ export const ImageCard: React.FC<ImageCardProps> = props => {
                         style={{
                             height: 180,
                         }}
-                        image={imageRequestModel.imageLink}
-                        title={imageRequestModel.imageLink}
+                        image={imageLink}
+                        title={imageLink}
                     />
                 </LazyLoad>
 
             </CardActionArea>
 
             <CardContent>
-                <Typography variant="body2" color="textSecondary" component="p">
-                    <b>Requested by</b>: {imageRequestModel.requestedBy}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" component="p">
-                    <b>Fulfilled by</b>: {imageRequestModel.fulfilledBy}
-                </Typography>
-                <Typography variant="body2" color="textSecondary" component="p">
-                    <b>Score</b>: {imageRequestModel.score}
-                </Typography>
+                {props.children}
             </CardContent>
 
             <CardActionArea
@@ -74,21 +64,23 @@ export const ImageCardModal: React.FC<{
     onClose: () => void;
 }> = props => {
     const { imageLink, open, onClose } = props;
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, [imageLink]);
 
     return (
         <Dialog open={open} onClose={onClose} scroll="body" maxWidth="xl" keepMounted={true}>
-            <DialogTitle>Test</DialogTitle>
+            <DialogTitle>{imageLink}</DialogTitle>
             <DialogContent>
-                {/*<LazyLoad>*/}
-                {/*    <img*/}
-                {/*        src={imageLink}*/}
-                {/*        alt={imageLink}*/}
-                {/*        style={{ width: "100%", height: "auto" }}*/}
-                {/*    />*/}
-                {/*</LazyLoad>*/}
+                <LazyLoad>
+                    <img
+                        src={imageLink}
+                        alt={imageLink}
+                        style={{
+                            // keep image inside browser window
+                            // without having to scroll
+                            maxWidth: window.innerWidth * 0.8,
+                            maxHeight: window.innerHeight * 0.8,
+                        }}
+                    />
+                </LazyLoad>
             </DialogContent>
         </Dialog>
     );

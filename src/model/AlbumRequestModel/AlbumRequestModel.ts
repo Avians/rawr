@@ -1,4 +1,6 @@
 export interface AlbumRequestModel {
+    type: "album";
+
     requestedBy: string;
     fulfilledBy: string;
     albumLink: string;

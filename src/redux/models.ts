@@ -5,12 +5,12 @@ import { Filter } from "../model/Filter";
 import { ImageRequestModel } from "../model/ImageRequestModel";
 import { Reddit } from "../api/Reddit";
 
-export type IsSelected = {
+export type Selectable = {
     isSelected: boolean
 };
 
 export interface ImageRequestResults {
-    results: Array<(ImageRequestModel & IsSelected)>;
+    results: Array<(ImageRequestModel & Selectable)>;
     selectedResults: Array<number>;
     toggleSelection: Action<ImageRequestResults, number>;
 
@@ -68,7 +68,15 @@ export const storeModel: StoreModel = {
             actions.resetImages();
 
             const thread = await Reddit.getRedditThread(redditUrl);
-            actions.addImageRequests(AsImageModels(thread));
+            AsImageModels(thread).forEach(model => {
+                switch (model.type) {
+                    case "image":
+                        actions.addImageRequest(model);
+                        break;
+                    case "album":
+                        break;
+                }
+            });
         }),
     },
     searchModel: {

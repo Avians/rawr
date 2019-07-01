@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { ImageCard } from "../../component/ImageCard";
+import { ImageCard, ImageCardModal } from "../../component/ImageCard";
 import { useStoreActions, useStoreState } from "../../redux/store";
 import { AggregateFilter } from "../../model/Filter";
 import { ImageRequestModel } from "../../model/ImageRequestModel";
 import { Grid } from "@material-ui/core";
+import Typography from "@material-ui/core/Typography";
 
 export const ImageGridView: React.FC = () => {
     const state = {
@@ -29,12 +30,14 @@ export const ImageGridView: React.FC = () => {
 
     return (
         <Grid container spacing={3} justify={"space-evenly"}>
+            <ImageCardModal imageLink={previewImage} open={openModal} onClose={() => setOpenModal(false)}/>
+
             {state.images.results
                 .filter(activeFilters())
                 .map((imageResult, index) => (
-                    <Grid item key={imageResult.imageLink} style={{ width: imageResult.isSelected ? "100%" : "" }}>
+                    <Grid item key={imageResult.imageLink}>
                         <ImageCard
-                            imageRequestModel={imageResult}
+                            imageLink={imageResult.imageLink}
                             isSelected={imageResult.isSelected}
                             onSelectClick={() => {
                                 actions.toggleImageSelection(index);
@@ -43,7 +46,17 @@ export const ImageGridView: React.FC = () => {
                                 setPreviewImage(imageResult.imageLink);
                                 setOpenModal(true);
                             }}
-                        />
+                        >
+                            <Typography variant="body2" color="textSecondary" component="p">
+                                <b>Requested by</b>: {imageResult.requestedBy}
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary" component="p">
+                                <b>Fulfilled by</b>: {imageResult.fulfilledBy}
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary" component="p">
+                                <b>Score</b>: {imageResult.score}
+                            </Typography>
+                        </ImageCard>
                     </Grid>
                 ))}
         </Grid>

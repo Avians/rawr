@@ -1,10 +1,6 @@
 import { Container, Grid, Typography } from "@material-ui/core";
-import { useStoreActions, useStoreState } from "../redux/store";
 
-import { AggregateFilter } from "../model/Filter";
-import { ImageCard, ImageCardModal } from "../component/ImageCard";
-import { ImageRequestModel } from "../model/ImageRequestModel";
-import React, { Component, useState } from "react";
+import React, { Component } from "react";
 import { SearchView } from "../views/SearchView";
 import { ImageGridView } from "../views/ImageGridView";
 
@@ -28,7 +24,6 @@ class Rawr extends Component {
                         <ImageGridView/>
                     </Grid>
                 </Grid>
-                {/*<ImageCardModal imageLink={previewImage} open={openModal} onClose={() => setOpenModal(false)}/>*/}
             </Container>
         );
     }

@@ -5,6 +5,7 @@ import { AggregateFilter } from "../../model/Filter";
 import { ImageRequestModel } from "../../model/ImageRequestModel";
 import { Grid } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
+import { AlbumCard } from "../../component/AlbumCard";
 
 export const ImageGridView: React.FC = () => {
     const state = {
@@ -14,9 +15,8 @@ export const ImageGridView: React.FC = () => {
         ),
     };
     const actions = {
-        toggleImageSelection: useStoreActions(
-            actions => actions.imageRequestResults.toggleImageSelection,
-        ),
+        toggleImageSelection: useStoreActions(actions => actions.imageRequestResults.toggleImageSelection),
+        toggleAlbumSelection: useStoreActions(actions => actions.imageRequestResults.toggleAlbumSelection),
     };
 
     const activeFilters = () => {
@@ -29,7 +29,7 @@ export const ImageGridView: React.FC = () => {
     const [previewImage, setPreviewImage] = useState("");
 
     return (
-        <Grid container spacing={3} justify={"space-evenly"}>
+        <Grid container spacing={3} justify="space-between">
             <ImageCardModal imageLink={previewImage} open={openModal} onClose={() => setOpenModal(false)}/>
 
             {state.images.imageResults
@@ -57,6 +57,32 @@ export const ImageGridView: React.FC = () => {
                                 <b>Score</b>: {imageResult.score}
                             </Typography>
                         </ImageCard>
+                    </Grid>
+                ))}
+            {state.images.albumResults
+                .map((albumResult, index) => (
+                    <Grid item key={albumResult.albumLink}>
+                        <AlbumCard
+                            albumLink={albumResult.albumLink}
+                            imageLinks={albumResult.imageLinks}
+                            onSelectClick={() => {
+                                actions.toggleAlbumSelection([index, albumResult.imageLinks[0]]);
+                            }}
+                            onImageClick={() => {
+                                setPreviewImage(albumResult.imageLinks[0]);
+                                setOpenModal(true);
+                            }}
+                        >
+                            <Typography variant="body2" color="textSecondary" component="p">
+                                <b>Requested by</b>: {albumResult.requestedBy}
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary" component="p">
+                                <b>Fulfilled by</b>: {albumResult.fulfilledBy}
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary" component="p">
+                                <b>Score</b>: {albumResult.score}
+                            </Typography>
+                        </AlbumCard>
                     </Grid>
                 ))}
         </Grid>

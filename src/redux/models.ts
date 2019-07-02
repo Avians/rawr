@@ -5,6 +5,7 @@ import { Filter } from "../model/Filter";
 import { ImageRequestModel } from "../model/ImageRequestModel";
 import { Reddit } from "../api/Reddit";
 import { AlbumRequestModel } from "../model/AlbumRequestModel";
+import { Imgur } from "../api/Imgur";
 
 type Selectable = {
     isSelected: boolean
@@ -27,8 +28,11 @@ export interface ImageRequestResults {
     addAlbumRequests: Action<ImageRequestResults, Array<AlbumRequestModel>>;
 
     resetImages: Action<ImageRequestResults>;
+    resetAlbums: Action<ImageRequestResults>;
+    resetAll: Action<ImageRequestResults>;
 
     fetchRedditThread: Thunk<ImageRequestResults, string>;
+    loadAlbumLinks: Thunk<ImageRequestResults, Array<AlbumRequestModel>>;
 }
 
 export interface SearchModel {
@@ -44,12 +48,15 @@ export interface FilterModel {
 }
 
 export interface StoreModel {
+    imgur: Imgur;
     imageRequestResults: ImageRequestResults;
     searchModel: SearchModel;
     filterModel: FilterModel;
 }
 
 export const storeModel: StoreModel = {
+    imgur: Imgur.fromEnv(),
+
     imageRequestResults: {
         imageResults: [],
         toggleImageSelection: action((state, index) => {
@@ -98,23 +105,59 @@ export const storeModel: StoreModel = {
 
         resetImages: action(state => {
             state.imageResults = [];
+        }),
+        resetAlbums: action(state => {
+            state.albumResults = [];
+        }),
+        resetAll: action(state => {
+            state.imageResults = [];
             state.albumResults = [];
         }),
 
         fetchRedditThread: thunk(async (actions, redditUrl) => {
-            actions.resetImages();
+            actions.resetAll();
 
             const thread = await Reddit.getRedditThread(redditUrl);
+
+            let albums: Array<AlbumRequestModel> = [];
             AsImageModels(thread).forEach(model => {
                 switch (model.type) {
                     case "image":
                         actions.addImageRequest(model);
                         break;
                     case "album":
-                        actions.addAlbumRequest(model);
+                        albums.push(model);
                         break;
                 }
             });
+
+            actions.loadAlbumLinks(albums);
+        }),
+        loadAlbumLinks: thunk(async (actions, albums) => {
+            const imgur = Imgur.fromEnv();
+
+            albums.forEach(album => {
+                imgur.fetchAlbumImages(album.albumLink).then(links => {
+                    if (links.length === 1) {
+                        // some stupid idiot made an album with only 1 image...
+                        // just parse it as a normal imagerequest
+                        actions.addImageRequest({
+                            type: "image",
+                            requestedBy: album.requestedBy,
+                            fulfilledBy: album.fulfilledBy,
+                            score: album.score,
+                            imageLink: links[0],
+                        });
+                    } else {
+                        const resolvedAlbum: AlbumRequestModel = {
+                            ...album,
+                            imageLinks: links,
+                        };
+                        actions.addAlbumRequest(resolvedAlbum);
+                    }
+                });
+            });
+
         }),
     },
     searchModel: {

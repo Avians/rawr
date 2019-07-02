@@ -5,8 +5,9 @@ import getUrls from "get-urls";
 
 export type ImageLink = {
     link: string;
-    type: "direct" | "album";
+    type: "direct" | "album" | "none";
 }
+
 
 const identifyUrlAsImage = (url: string): Array<ImageLink> => {
     const tokens = url
@@ -27,16 +28,29 @@ const identifyUrlAsImage = (url: string): Array<ImageLink> => {
         );
 
     const imgurAlbums = tokens
-        .filter(url => url.match(/https:\/\/(?:www\.)?imgur\.com\/(?:a|gallery)\/([\w]+)\/?/g))
-        .map(token => {
-                const link: ImageLink = {
-                    link: token,
-                    type: "album",
-                };
+        .flatMap((token: string) => {
+                const regex = /https:\/\/(?:www\.)?imgur\.com\/(?:a|gallery)\/([\w]+)\/?/g;
+                // @ts-ignore
+                const matches = [...token["matchAll"](regex)];
+                if (matches.length === 0) {
+                    const link: ImageLink = {
+                        link: " match[1]",
+                        type: "none",
+                    };
+                    return link;
+                }
 
-                return link;
+                return matches.map(match => {
+                    const link: ImageLink = {
+                        link: match[1],
+                        type: "album",
+                    };
+                    return link;
+                });
             },
-        );
+        )
+        .filter((link: ImageLink) => link.type !== "none");
+
 
     return [...directLinks, ...imgurAlbums];
 };
@@ -45,16 +59,31 @@ const recursiveFindImagesByDepth = (comment: RedditComment, currentDepth: number
     let fulfilled: Array<ImageRequestModel | AlbumRequestModel> = [];
 
     const addImage = (comment: RedditComment, image: ImageLink) => {
-        if (image.type === "direct") {
-            fulfilled.push({
-                type: "image",
-                fulfilledBy: comment.author,
-                requestedBy: "",
-                imageLink: image.link,
-                score: comment.upVotes,
-            });
-        } else {
+        switch (image.type) {
+            case "direct": {
+                fulfilled.push({
+                    type: "image",
+                    fulfilledBy: comment.author,
+                    requestedBy: "",
+                    imageLink: image.link,
+                    score: comment.upVotes,
+                });
 
+                break;
+            }
+            case "album": {
+
+                fulfilled.push({
+                    type: "album",
+                    fulfilledBy: comment.author,
+                    requestedBy: "",
+                    score: comment.upVotes,
+                    albumLink: image.link,
+                    imageLinks: [],
+                });
+
+                break;
+            }
         }
     };
 

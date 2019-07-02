@@ -13,9 +13,9 @@ import { Grid } from "@material-ui/core";
 interface AlbumCardProps {
     albumLink: string;
     imageLinks: string[];
-    isSelected?: boolean;
-    onSelectClick?: () => void;
-    onImageClick?: () => void;
+    isSelected: (image: string) => boolean;
+    onSelectClick?: (image: string) => void;
+    onImageClick?: (image?: string) => void;
 }
 
 export const AlbumCard: React.FC<AlbumCardProps> = props => {
@@ -26,7 +26,7 @@ export const AlbumCard: React.FC<AlbumCardProps> = props => {
         <Card style={{
             minWidth: 300,
             width: expanded ? "1280px" : "",
-        }} raised={isSelected}>
+        }}>
             {!expanded ?
                 <>
                     <CardActionArea onClick={() => {
@@ -45,14 +45,18 @@ export const AlbumCard: React.FC<AlbumCardProps> = props => {
                     </CardActionArea>
                 </> :
                 <>
-                    <Grid container spacing={3} justify="space-between">
+                    <Grid container spacing={1} justify="space-evenly" style={{ padding: "10px" }}>
                         {imageLinks.map(image => {
                             return (
                                 <Grid item key={image}>
                                     <ImageCard
                                         imageLink={image}
-                                        onSelectClick={onSelectClick}
-                                        isSelected={isSelected}/>
+                                        onSelectClick={() => {
+                                            if (onSelectClick) onSelectClick(image);
+                                        }}
+                                        isSelected={isSelected ? isSelected(image) : false}
+                                        onImageClick={() => onImageClick ? onImageClick(image) : null}
+                                    />
                                 </Grid>
                             );
                         })}

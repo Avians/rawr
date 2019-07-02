@@ -65,11 +65,16 @@ export const ImageGridView: React.FC = () => {
                         <AlbumCard
                             albumLink={albumResult.albumLink}
                             imageLinks={albumResult.imageLinks}
-                            onSelectClick={() => {
-                                actions.toggleAlbumSelection([index, albumResult.imageLinks[0]]);
+                            onSelectClick={(image) => {
+                                actions.toggleAlbumSelection([index, image]);
                             }}
-                            onImageClick={() => {
-                                setPreviewImage(albumResult.imageLinks[0]);
+                            isSelected={(image) => state.images.albumResults[index].selectedLinks.includes(image)}
+                            onImageClick={(image?: string) => {
+                                if (image) {
+                                    setPreviewImage(image);
+                                } else {
+                                    setPreviewImage(albumResult.imageLinks[0]);
+                                }
                                 setOpenModal(true);
                             }}
                         >

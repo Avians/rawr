@@ -12,7 +12,7 @@ type Selectable = {
 };
 
 type Image = (ImageRequestModel & Selectable);
-type Album = (AlbumRequestModel & { selectedLinks: Map<string, Selectable> });
+type Album = (AlbumRequestModel & { selectedLinks: Array<string> });
 
 export interface ImageRequestResults {
     imageResults: Array<Image>;
@@ -65,11 +65,12 @@ export const storeModel: StoreModel = {
 
         albumResults: [],
         toggleAlbumSelection: action((state, [index, link]) => {
-            state.albumResults[index].selectedLinks.set(link, {
-                isSelected: !state.albumResults[index].selectedLinks.get(link),
-            });
+            if (state.albumResults[index].selectedLinks.includes(link)) {
+                state.albumResults[index].selectedLinks = state.albumResults[index].selectedLinks.filter(l => l !== link);
+            } else {
+                state.albumResults[index].selectedLinks.push(link);
+            }
         }),
-
 
         addImageRequest: action((state, imageRequest) => {
             state.imageResults = [...state.imageResults, { ...imageRequest, isSelected: false, type: "image" }];
@@ -88,7 +89,7 @@ export const storeModel: StoreModel = {
             state.albumResults = [...state.albumResults, {
                 ...albumRequest,
                 type: "album",
-                selectedLinks: new Map<string, Selectable>(),
+                selectedLinks: [],
             }];
         }),
         addAlbumRequests: action((state, albumRequests) => {
@@ -97,7 +98,7 @@ export const storeModel: StoreModel = {
                     return {
                         ...albumRequest,
                         type: "album",
-                        selectedLinks: new Map<string, Selectable>(),
+                        selectedLinks: [],
                     };
                 }),
             ];
